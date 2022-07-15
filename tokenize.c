@@ -582,6 +582,7 @@ Token *tokenize(File *file) {
       continue;
     }
 
+#if 0
     // Character literal
     if (*p == '\'') {
       cur = cur->next = read_char_literal(p, p, ty_int);
@@ -589,6 +590,7 @@ Token *tokenize(File *file) {
       p += cur->len;
       continue;
     }
+#endif
 
     // UTF-16 character literal
     if (startswith(p, "u'")) {
