@@ -1,4 +1,5 @@
 #include "chibicc.h"
+#include <libgen.h>
 
 typedef enum {
   FILE_NONE, FILE_C, FILE_ASM, FILE_OBJ, FILE_AR, FILE_DSO,
@@ -434,9 +435,16 @@ static void print_tokens(Token *tok) {
   FILE *out = open_file(opt_o ? opt_o : "-");
 
   int line = 1;
+  int line_no = 1;
+  fprintf(out, "# %d \"%s\"\n", line_no-tok->line_delta, basename(tok->filename));
   for (; tok->kind != TK_EOF; tok = tok->next) {
-    if (line > 1 && tok->at_bol)
+    if (line > 1 && tok->at_bol) {
       fprintf(out, "\n");
+      if(line_no != tok->line_no-1) {
+        fprintf(out, "# %d \"%s\"\n", tok->line_no+tok->line_delta, basename(tok->filename));
+      }
+      line_no++;
+    }
     if (tok->has_space && !tok->at_bol)
       fprintf(out, " ");
     fprintf(out, "%.*s", tok->len, tok->loc);
