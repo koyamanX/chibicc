@@ -435,13 +435,16 @@ static void print_tokens(Token *tok) {
   FILE *out = open_file(opt_o ? opt_o : "-");
 
   int line = 1;
-  int line_no = 1;
-  fprintf(out, "# %d \"%s\"\n", line_no-tok->line_delta, basename(tok->filename));
-  for (; tok->kind != TK_EOF; tok = tok->next) {
+  int line_no = 2;
+  Token *tok_prev = tok;
+  fprintf(out, "# 1 \"%s\"\n", basename(tok->filename));
+  for (; tok->kind != TK_EOF; tok_prev = tok, tok = tok->next) {
     if (line > 1 && tok->at_bol) {
       fprintf(out, "\n");
-      if(line_no != tok->line_no-1) {
-        fprintf(out, "# %d \"%s\"\n", tok->line_no+tok->line_delta, basename(tok->filename));
+      if(line_no != tok->line_no) {
+	if(tok->line_no-1 != tok_prev->line_no) {
+	  fprintf(out, "# %d \"%s\"\n", tok->line_no, basename(tok->filename));
+	}
       }
       line_no++;
     }
